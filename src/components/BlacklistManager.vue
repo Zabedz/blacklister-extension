@@ -1,19 +1,28 @@
 <template>
-  <div>
+  <div class="blacklist-manager bg-light p-4">
     <h1>Domain Blacklister</h1>
-    <div>
-      <input v-model="newDomain" placeholder="Add domain..."/>
-      <button @click="addDomain">Add</button>
+    <div class="input-group my-3">
+      <input v-model="newDomain" class="form-control"/>
+      <div class="input-group-append">
+        <button @click="addDomain" class="btn add-button">Add</button>
+      </div>
     </div>
-    <ul>
-      <li v-for="(domain, index) in blacklistedDomains" :key="index">
+    <ul class="list-group">
+      <li v-for="(domain, index) in blacklistedDomains" :key="index"
+          class="list-group-item d-flex justify-content-between align-items-center">
         {{ domain }}
-        <button @click="removeDomain(index)">Remove</button>
+        <button @click="removeDomain(index)" class="btn btn-link text-danger btn-sm p-0">
+          <span class="material-icons">clear</span>
+        </button>
       </li>
     </ul>
-    <button @click="save">Save</button>
+    <button @click="save" class="btn"
+            :class="{ 'btn-secondary': !hasChanges, 'btn-primary': hasChanges }"
+            :disabled="!hasChanges">Save
+    </button>
   </div>
 </template>
+
 
 <script>
 export default {
@@ -22,6 +31,7 @@ export default {
     return {
       blacklistedDomains: [],
       newDomain: "",
+      hasChanges: false,
     };
   },
   created() {
@@ -41,16 +51,19 @@ export default {
       console.log("Adding domain:", this.newDomain);
       this.newDomain && this.blacklistedDomains.push(this.newDomain);
       this.newDomain = "";
+      this.hasChanges = true;
     },
     removeDomain(index) {
       console.log("Removing domain:", this.blacklistedDomains[index]);
       this.blacklistedDomains.splice(index, 1);
+      this.hasChanges = true;
     },
     save() {
       console.log("Saving blacklisted domains:", this.blacklistedDomains);
       chrome.storage.sync.set({blacklistedDomains: this.blacklistedDomains}, () => {
         console.log("Blacklisted domains saved successfully.");
         this.updateRules(this.blacklistedDomains);
+        this.hasChanges = false;
       });
     },
 
@@ -85,5 +98,29 @@ export default {
 </script>
 
 <style scoped>
-/* Add your styles here */
+.blacklist-manager {
+  max-width: 500px;
+  margin: 0 auto;
+  border-radius: 4px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
+  font-family: 'Roboto', sans-serif;
+}
+
+h1 {
+  font-size: 24px;
+  font-weight: 500;
+  margin-bottom: 1rem;
+}
+
+.add-button {
+  background-color: #008000;
+  border-color: #008000;
+}
+
+.add-button:hover,
+.add-button:focus {
+  background-color: #006400;
+  border-color: #006400;
+}
 </style>
+
