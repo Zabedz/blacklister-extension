@@ -1,5 +1,12 @@
-function updateRules(blacklistedDomains) {
-    chrome.declarativeNetRequest.getDynamicRules((rules) => {
+/* global chrome */
+/**
+ * This function is used to update the rules in the declarativeNetRequest API.
+ * @param blacklistedDomains array of domains to blacklist.
+ * @param getDynamicRules function to get the existing rules.
+ * @param updateDynamicRules function to update the rules.
+ */
+function updateRules(blacklistedDomains, getDynamicRules, updateDynamicRules) {
+    getDynamicRules((rules) => {
         const ruleIdsToRemove = rules.flatMap((rule) => rule.id);
 
         const newRules = blacklistedDomains.map((domain, index) => ({
@@ -11,7 +18,7 @@ function updateRules(blacklistedDomains) {
                 resourceTypes: ["main_frame"],
             },
         }));
-        chrome.declarativeNetRequest.updateDynamicRules(
+        updateDynamicRules(
             {
                 removeRuleIds: ruleIdsToRemove,
                 addRules: newRules,
@@ -25,13 +32,31 @@ function updateRules(blacklistedDomains) {
     });
 }
 
-chrome.storage.onChanged.addListener((changes, areaName) => {
+/**
+ * This function is used to listen for changes in the storage API.
+ * @param changes object containing the changes in the storage API.
+ * @param areaName name of the area in the storage API. We are watching the area "sync".
+ * @param getDynamicRules function to get the existing rules.
+ * @param updateDynamicRules function to update the rules.
+ */
+function onChangedListener(changes, areaName, getDynamicRules, updateDynamicRules) {
     if (areaName === "sync" && changes.blacklistedDomains) {
         let blacklistedDomains = changes.blacklistedDomains.newValue;
 
         if (typeof blacklistedDomains === "object" && !Array.isArray(blacklistedDomains)) {
             blacklistedDomains = Object.values(blacklistedDomains);
         }
-        updateRules(blacklistedDomains);
+        updateRules(blacklistedDomains, getDynamicRules, updateDynamicRules);
     }
-});
+}
+
+/**
+ * This function is used to set up the listener for changes in the storage API. It is called in the main.js.
+ */
+function setupOnChangedListener() {
+    chrome.storage.onChanged.addListener((changes, areaName) => {
+        onChangedListener(changes, areaName, chrome.declarativeNetRequest.getDynamicRules, chrome.declarativeNetRequest.updateDynamicRules);
+    });
+}
+
+export {updateRules, onChangedListener, setupOnChangedListener};

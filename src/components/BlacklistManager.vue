@@ -23,7 +23,6 @@
   </div>
 </template>
 
-
 <script>
 export default {
   /* global chrome */
@@ -48,20 +47,16 @@ export default {
 
   methods: {
     addDomain() {
-      console.log("Adding domain:", this.newDomain);
       this.newDomain && this.blacklistedDomains.push(this.newDomain);
       this.newDomain = "";
       this.hasChanges = true;
     },
     removeDomain(index) {
-      console.log("Removing domain:", this.blacklistedDomains[index]);
       this.blacklistedDomains.splice(index, 1);
       this.hasChanges = true;
     },
     save() {
-      console.log("Saving blacklisted domains:", this.blacklistedDomains);
       chrome.storage.sync.set({blacklistedDomains: this.blacklistedDomains}, () => {
-        console.log("Blacklisted domains saved successfully.");
         this.updateRules(this.blacklistedDomains);
         this.hasChanges = false;
       });
@@ -87,8 +82,6 @@ export default {
           () => {
             if (chrome.runtime.lastError) {
               console.error(chrome.runtime.lastError);
-            } else {
-              console.log("Rules updated successfully");
             }
           }
       );
@@ -123,4 +116,3 @@ h1 {
   border-color: #006400;
 }
 </style>
-
