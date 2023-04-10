@@ -1,4 +1,5 @@
-import {updateRules, onChangedListener} from "../../public/background";
+// Add this line at the beginning of the file
+const {updateRules, onChangedListener} = require("../../public/background.js");
 
 describe("background.js", () => {
     describe("updateRules", () => {
@@ -19,6 +20,7 @@ describe("background.js", () => {
 
             const updateDynamicRules = jest.fn();
 
+            // Use window.updateRules here
             updateRules(blacklistedDomains, getDynamicRules, updateDynamicRules);
 
             expect(updateDynamicRules).toHaveBeenCalled();
@@ -42,6 +44,7 @@ describe("background.js", () => {
 
             const updateDynamicRules = jest.fn();
 
+            // Use window.onChangedListener here
             onChangedListener(changes, areaName, getDynamicRules, updateDynamicRules);
 
             expect(updateDynamicRules).toHaveBeenCalled();
@@ -59,6 +62,7 @@ describe("background.js", () => {
             const getDynamicRules = jest.fn();
             const updateDynamicRules = jest.fn();
 
+            // Use window.onChangedListener here
             onChangedListener(changes, areaName, getDynamicRules, updateDynamicRules);
 
             expect(getDynamicRules).not.toHaveBeenCalled();

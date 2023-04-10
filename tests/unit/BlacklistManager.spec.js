@@ -13,6 +13,10 @@ global.chrome = {
     },
 };
 
+// Mock the window.updateRules method
+const updateRulesMock = jest.fn();
+global.window.updateRules = updateRulesMock;
+
 // Mock the chrome.declarativeNetRequest.updateDynamicRules method
 const updateDynamicRulesMock = jest.fn();
 global.chrome.declarativeNetRequest = {
@@ -65,7 +69,7 @@ describe("BlacklistManager.vue", () => {
         // Simulate the callback
         storageSetMock.mock.calls[0][1]();
 
-        expect(updateDynamicRulesMock).toBeCalled();
+        expect(updateRulesMock).toBeCalled();
         expect(wrapper.vm.hasChanges).toBe(false);
     });
 });

@@ -57,8 +57,7 @@ export default {
     },
     save() {
       chrome.storage.sync.set({blacklistedDomains: this.blacklistedDomains}, () => {
-        this.updateRules(this.blacklistedDomains);
-        this.hasChanges = false;
+        window.updateRules && window.updateRules(this.blacklistedDomains, chrome.declarativeNetRequest.getDynamicRules, chrome.declarativeNetRequest.updateDynamicRules);        this.hasChanges = false;
       });
     },
 
